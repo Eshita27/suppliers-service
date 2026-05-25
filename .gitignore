@@ -1,0 +1,8 @@
+# Binaries for programs and plugins
+bin/
+include/
+obj/
+
+# Environment configurations
+.env
+*.local
