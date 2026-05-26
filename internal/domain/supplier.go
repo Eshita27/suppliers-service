@@ -21,3 +21,9 @@ type SupplierUseCase interface {
 	Create(ctx context.Context, supplier *Supplier) error
 	GetAll(ctx context.Context) ([]Supplier, error)
 }
+
+// SupplierRepository defines the persistence contract for MongoDB.
+type SupplierRepository interface {
+	Store(ctx context.Context, supplier *Supplier) error
+	FetchAll(ctx context.Context) ([]Supplier, error)
+}
