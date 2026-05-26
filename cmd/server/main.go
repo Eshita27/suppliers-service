@@ -4,13 +4,13 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"suppliers-api/config"
 	delivery "suppliers-api/internal/delivery/http"
 	"suppliers-api/internal/repository"
 	"suppliers-api/internal/usecase"
@@ -20,30 +20,23 @@ func main() {
 	log.Println("Starting Suppliers API Service...")
 
 	// 1. Fetch environment configuration (Fallbacks for local run outside Docker)
-	mongoURI := os.Getenv("MONGO_URI")
-	if mongoURI == "" {
-		mongoURI = "mongodb://localhost:27017"
+	// 1. Initialize Secure Configuration Matrix via HashiCorp Vault
+	appConfig, err := config.LoadConfig()
+	if err != nil {
+		log.Printf("Vault initialization warning: %v. Proceeding with structural fallbacks.", err)
+		appConfig = &config.AppConfig{
+			MongoURI: "mongodb://localhost:27017",
+			DBName:   "polyglot_inventory",
+			Port:     "8080",
+		}
 	}
 
-	dbName := os.Getenv("MONGO_DB_NAME")
-	if dbName == "" {
-		dbName = "polyglot_inventory"
-	}
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	// 2. Initialize Database Connection Context
+	// 2. Initialize Database Connection Context using safe variables
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	log.Printf("Connecting to MongoDB at: %s", mongoURI)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
-	if err != nil {
-		log.Fatalf("Failed to initialize MongoDB client options: %v", err)
-	}
+	log.Printf("Connecting to MongoDB via configuration registry...")
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(appConfig.MongoURI))
 
 	// Verify the network connection to the database cluster
 	if err := client.Ping(ctx, nil); err != nil {
@@ -51,7 +44,7 @@ func main() {
 	}
 	log.Println("Successfully connected to MongoDB cluster!")
 
-	db := client.Database(dbName)
+	db := client.Database(appConfig.DBName)
 
 	// 3. Clean Architecture Dependency Injection (Bottom to Top)
 	repo := repository.NewMongoSupplierRepository(db, "suppliers")
@@ -69,8 +62,8 @@ func main() {
 	delivery.NewSupplierHandler(router, uCase)
 
 	// 5. Start Server Listener Engine
-	log.Printf("Suppliers API server running on port :%s", port)
-	if err := router.Run(":" + port); err != nil {
+	log.Printf("Suppliers API server running on port :%s", appConfig.Port) // Fix here
+	if err := router.Run(":" + appConfig.Port); err != nil {               // Fix here
 		log.Fatalf("Failed to start web server router: %v", err)
 	}
 }
