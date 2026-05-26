@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  suppliers-db:
+    image: mongo:latest
+    container_name: polyglot-suppliers-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_supplier_data:/data/db
+    networks:
+      - polyglot-mesh
+
+  suppliers-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: polyglot-suppliers-service
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGO_URI=mongodb://suppliers-db:27017
+      - MONGO_DB_NAME=polyglot_inventory
+      - PORT=8080
+    depends_on:
+      - suppliers-db
+    networks:
+      - polyglot-mesh
+
+volumes:
+  mongo_supplier_data:
+
+networks:
+  polyglot-mesh:
+    driver: bridge

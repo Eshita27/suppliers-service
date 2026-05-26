@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 
-	"suppliers-api/internal/domain"
+	"polyglot/suppliers/internal/domain"
 
 	"github.com/gin-gonic/gin"
 )
