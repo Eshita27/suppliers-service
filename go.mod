@@ -1,4 +1,4 @@
-module polyglot/suppliers
+module suppliers-api
 
 go 1.26.3
 

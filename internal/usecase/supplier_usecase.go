@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"polyglot/suppliers/internal/domain"
+	"suppliers-api/internal/domain"
 )
 
 type supplierUseCase struct {

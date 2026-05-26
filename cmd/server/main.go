@@ -11,9 +11,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	delivery "polyglot/suppliers/internal/delivery/http"
-	"polyglot/suppliers/internal/repository"
-	"polyglot/suppliers/internal/usecase"
+	delivery "suppliers-api/internal/delivery/http"
+	"suppliers-api/internal/repository"
+	"suppliers-api/internal/usecase"
 )
 
 func main() {
