@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"time"
 )
 
@@ -17,6 +18,6 @@ type Supplier struct {
 
 // SupplierUseCase defines the business contract our API will execute.
 type SupplierUseCase interface {
-	Create(supplier *Supplier) error
-	GetAll() ([]Supplier, error)
+	Create(ctx context.Context, supplier *Supplier) error
+	GetAll(ctx context.Context) ([]Supplier, error)
 }
