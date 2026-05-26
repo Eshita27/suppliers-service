@@ -1,8 +1,16 @@
-# Binaries for programs and plugins
+# Compiled binaries
 bin/
-include/
-obj/
+main
+server
 
-# Environment configurations
-.env
-*.local
+# Dependency directories
+vendor/
+
+# IDE files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
