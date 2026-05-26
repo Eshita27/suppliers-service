@@ -1,0 +1,80 @@
+definitions:
+  domain.Supplier:
+    properties:
+      contact:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      tier:
+        description: e.g., Tier-1 Premium, Tier-2 Standard
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /suppliers:
+    get:
+      description: Retrieves a full list of registered suppliers from MongoDB
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns wrapped supplier list array
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/domain.Supplier'
+              type: array
+            type: object
+        "500":
+          description: Internal database query failure
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all supply chain vendors
+      tags:
+      - suppliers
+    post:
+      consumes:
+      - application/json
+      description: Validates and stores a new supplier profile into the system
+      parameters:
+      - description: Supplier Profiles Payload
+        in: body
+        name: supplier
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Supplier'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Returns success message and supplier data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid payload error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "422":
+          description: Business validation logic failure
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new vendor
+      tags:
+      - suppliers
+swagger: "2.0"

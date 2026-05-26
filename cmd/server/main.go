@@ -14,6 +14,12 @@ import (
 	delivery "suppliers-api/internal/delivery/http"
 	"suppliers-api/internal/repository"
 	"suppliers-api/internal/usecase"
+
+	// Import the auto-generated docs folder we are about to create
+	_ "suppliers-api/docs"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
@@ -57,6 +63,8 @@ func main() {
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "healthy", "service": "suppliers-api"})
 	})
+	// Swagger API documentation endpoint
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Register our functional domain routes
 	delivery.NewSupplierHandler(router, uCase)

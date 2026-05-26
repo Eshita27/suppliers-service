@@ -27,6 +27,16 @@ func NewSupplierHandler(r *gin.Engine, us domain.SupplierUseCase) {
 }
 
 // CreateSupplier handles POST requests to register a new vendor
+// @Summary      Register a new vendor
+// @Description  Validates and stores a new supplier profile into the system
+// @Tags         suppliers
+// @Accept       json
+// @Produce      json
+// @Param        supplier  body      domain.Supplier  true  "Supplier Profiles Payload"
+// @Success      201       {object}  map[string]interface{} "Returns success message and supplier data"
+// @Failure      400       {object}  map[string]string "Invalid payload error"
+// @Failure      422       {object}  map[string]string "Business validation logic failure"
+// @Router       /suppliers [post]
 func (h *SupplierHandler) CreateSupplier(c *gin.Context) {
 	var supplier domain.Supplier
 
@@ -49,6 +59,13 @@ func (h *SupplierHandler) CreateSupplier(c *gin.Context) {
 }
 
 // FetchSuppliers handles GET requests to retrieve tracked inventory vendors
+// @Summary      Get all supply chain vendors
+// @Description  Retrieves a full list of registered suppliers from MongoDB
+// @Tags         suppliers
+// @Produce      json
+// @Success      200  {object}  map[string][]domain.Supplier "Returns wrapped supplier list array"
+// @Failure      500  {object}  map[string]string "Internal database query failure"
+// @Router       /suppliers [get]
 func (h *SupplierHandler) FetchSuppliers(c *gin.Context) {
 	suppliers, err := h.SUsecase.GetAll(c.Request.Context())
 	if err != nil {
