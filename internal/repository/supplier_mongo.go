@@ -1,0 +1,59 @@
+package repository
+
+import (
+	"context"
+	"time"
+
+	"polyglot/suppliers/internal/domain"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+type MongoSupplierRepository struct {
+	collection *mongo.Collection
+}
+
+// NewMongoSupplierRepository instantiates our data access object
+func NewMongoSupplierRepository(db *mongo.Database, collectionName string) *MongoSupplierRepository {
+	return &MongoSupplierRepository{
+		collection: db.Collection(collectionName),
+	}
+}
+
+// Store inserts a brand new vendor record asynchronously into our cluster
+func (m *MongoSupplierRepository) Store(ctx context.Context, supplier *domain.Supplier) error {
+	if supplier.ID == "" {
+		supplier.ID = primitive.NewObjectID().Hex()
+	}
+	supplier.CreatedAt = time.Now().UTC()
+
+	_, err := m.collection.InsertOne(ctx, supplier)
+	return err
+}
+
+// FetchAll retrieves all tracked suppliers out of the collection
+func (m *MongoSupplierRepository) FetchAll(ctx context.Context) ([]domain.Supplier, error) {
+	var suppliers []domain.Supplier
+
+	cursor, err := m.collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var s domain.Supplier
+		if err := cursor.Decode(&s); err != nil {
+			return nil, err
+		}
+		suppliers = append(suppliers, s)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return suppliers, nil
+}
